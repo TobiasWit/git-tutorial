@@ -64,6 +64,11 @@ void errno_abort(char *message) {
   exit(EXIT_FAILURE);
 }
 
+void err_abort(int status, char *message) {
+  fprintf(stderr, "%s\n", message);
+  exit(status);
+}
+
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   arguments_t *arguments = state->input;
 
@@ -175,12 +180,12 @@ int main(int argc, char **argv) {
          arguments.verbose ? "yes" : "no", arguments.tick);
 
   /** Initialize state machine */
-  states_add(timer_callback, NULL, state_one_run, NULL, state_first_x,
+  states_add(state_probe, NULL, state_one_run, NULL, state_first_e,
              FIRST_STATE_NAME);
-  states_add(state_probe, NULL, state_three_run, NULL, state_third_e,
-             THIRD_STATE_NAME);
   states_add(state_probe, state_two_enter, state_two_run, state_two_exit,
              state_second_e, SECOND_STATE_NAME);
+  states_add(state_probe, NULL, state_three_run, NULL, state_third_e,
+             THIRD_STATE_NAME);
 
   states_set_callback(statemachine_callback);
 
@@ -192,7 +197,7 @@ int main(int argc, char **argv) {
   create_timer(arguments.tick);
 
   error = pthread_mutex_lock(&mutex);
-  if (!error)
+  if (error != 0)
     err_abort(error, "Lock mutex");
 
   while (count < count_to) {
@@ -209,11 +214,5 @@ int main(int argc, char **argv) {
 
   printf("Finshed\n");
 
-  return -1;
-}
-
-void err_abort(int status, char *message) {
-  fprintf(stderr, "%s\n", message);
-  exit(status);
   return 0;
 }
