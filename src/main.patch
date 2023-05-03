@@ -1,0 +1,13 @@
+diff --git a/src/main.c b/src/main.c
+index 3eb7b8f..5615954 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -2,4 +2,7 @@
+ 
+ int main(int argc, char *argv[]){
+     printf("Hello ESPL");
++    printf("This is a new print");
++
++    return 0;
+ }
+\ No newline at end of file
